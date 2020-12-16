@@ -4,6 +4,8 @@ import Text from './Text';
 import { TouchableOpacity, View, StyleSheet } from 'react-native';
 import { Formik } from 'formik';
 import * as yup from 'yup';
+import useSignIn from '../hooks/useSignIn';
+import { useHistory } from 'react-router-native';
 
 const styles = StyleSheet.create({
   container: {
@@ -67,12 +69,20 @@ const SignInForm = ({ onSubmit }) => {
 
 // eslint-disable-next-line no-unused-vars
 const SignIn = () => {
-  const onSubmit = (values) => {
-    const username = values.username;
-    const password = values.password;
 
-    console.log(username);
-    console.log(password);
+  const [signIn] = useSignIn();
+  let history = useHistory();
+
+  const onSubmit = async (values) => {
+    const { username, password } = values;
+
+    try {
+      const bool = await signIn({ username, password });
+      if (bool) history.push("/");
+      
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (

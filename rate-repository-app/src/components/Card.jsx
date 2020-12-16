@@ -27,6 +27,7 @@ const cardHeaderStyles = StyleSheet.create({
   infoContainer: {
     flexGrow: 1,
     paddingTop: 5,
+    flexShrink: 1,
   },
   tinyLogo: {
     width: 50,
@@ -49,8 +50,8 @@ const CardHeader = ({ item }) => {
             {item.fullName}
           </Text>
         </View>
-        <View>
-          <Text color="textSecondary">{item.description}</Text>
+        <View style={{ flexDirection: 'row' }}>
+          <Text color="textSecondary" style={{ flexShrink: 1 }}>{item.description}</Text>
         </View>
       </View>
     </View>
@@ -120,7 +121,7 @@ const CardFooter = ({ item }) => {
         <CardFooterAction style={{alignSelf: 'center'}}>Stars</CardFooterAction>
       </View>
       <View>
-        <Text style={{alignSelf: 'center'}}>{item.forksCount > 1000 ? String(Math.round(item.forksCount/100)/10).concat('k') : item.forksCount}</Text>
+        <Text style={{alignSelf: 'center'}}>{item.forksCount > 10000 ? String(Math.round(item.forksCount/100)/10).concat('k') : item.forksCount}</Text>
         <CardFooterAction style={{alignSelf: 'center'}}>Forks</CardFooterAction>
       </View>
       <View>
