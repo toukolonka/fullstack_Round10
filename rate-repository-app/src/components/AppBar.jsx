@@ -13,15 +13,18 @@ import { useHistory } from 'react-router-native';
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    paddingTop: Constants.statusBarHeight + 10,
+    paddingTop: Constants.statusBarHeight,
     backgroundColor: theme.colors.appBar,
-    paddingBottom: 10,
+    paddingBottom: 5,
   },
   text: {
     fontSize: theme.fontSizes.appBar,
     color: theme.colors.textAppBar,
-    paddingLeft: 15,
+    paddingHorizontal: 8,
   },
+  link: {
+    paddingVertical: 15,
+  }
 });
 
 const AppBar = () => {
@@ -45,27 +48,39 @@ const AppBar = () => {
   let history = useHistory();
 
   const reset = async () => {
-    console.log(result.data);
+    history.push('/signin');
     await authStorage.removeAccessToken();
-    console.log(authStorage.getAccessToken());
     await apolloClient.resetStore();
-    console.log(result.data);
-    history.push("/signin");
   };
 
   return (
     <View style={styles.container}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <Link to="/" component={TouchableOpacity} activeOpacity={0.8}>
+        <Link to="/" component={TouchableOpacity} activeOpacity={0.8} style={styles.link}>
           <Text style={styles.text}>Repositories</Text>
         </Link>
         {user ? (
-          <TouchableOpacity onPress={reset}>
+          <Link to="/review" component={TouchableOpacity} activeOpacity={0.8} style={styles.link}>
+            <Text style={styles.text}>Create a Review</Text>
+          </Link>
+        ) : null}
+        {user ? (
+          <Link to="/reviews" component={TouchableOpacity} activeOpacity={0.8} style={styles.link}>
+            <Text style={styles.text}>My Reviews</Text>
+          </Link>
+        ) : null}
+        {user ? (
+          <TouchableOpacity onPress={reset} style={styles.link}>
             <Text style={styles.text}>Sign Out</Text>
           </TouchableOpacity>
         ) : (
-          <Link to="/signin" component={TouchableOpacity} activeOpacity={0.8}>
+          <Link to="/signin" component={TouchableOpacity} activeOpacity={0.8} style={styles.link}>
             <Text style={styles.text}>Sign In</Text>
+          </Link>
+        )}
+        {user ? null : (
+          <Link to="/signup" component={TouchableOpacity} activeOpacity={0.8} style={styles.link}>
+            <Text style={styles.text}>Sign Up</Text>
           </Link>
         )}
       </ScrollView>

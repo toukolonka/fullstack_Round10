@@ -1,9 +1,10 @@
 import React from 'react';
 import FormikTextInput from './FormikTextInput';
 import Text from './Text';
-import { TouchableOpacity, View, StyleSheet, Alert } from 'react-native';
+import { TouchableOpacity, View, StyleSheet } from 'react-native';
 import { Formik } from 'formik';
 import * as yup from 'yup';
+import useSignUp from '../hooks/useSignUp';
 import useSignIn from '../hooks/useSignIn';
 import { useHistory } from 'react-router-native';
 
@@ -37,10 +38,20 @@ const styles = StyleSheet.create({
 const validationSchema = yup.object().shape({
     username: yup
       .string()
-      .required('Username is required'),
+      .required('Username is required')
+      .min(1, 'Username must be at least 5 characters')
+      .max(30, 'Username can be at most 30 characters'),
     password: yup
       .string()
-      .required('Password is required'),
+      .required('Password is required')
+      .min(5, 'Must be at least 5 characters')
+      .max(50, 'Must be at most 50 characters'),
+    password2: yup
+      .string()
+      .oneOf([yup.ref('password'), null], "Passwords do not match")
+      .required('Password confirmation is required')
+      .min(5, 'Must be at least 5 characters')
+      .max(50, 'Must be at most 50 characters'),
   });
 
 const initialValues = {
@@ -48,42 +59,50 @@ const initialValues = {
   password: '',
 };
 
-const SignInForm = ({ onSubmit }) => {
+const SignUpForm = ({ onSubmit }) => {
   return (
     <View style={styles.container}>
       <FormikTextInput
         style={styles.input}
         name="username"
-        placeholder="username"
+        placeholder="Username"
         testID='usernameField'
         autoCapitalize = 'none'
       />
       <FormikTextInput
         style={styles.input}
         name="password"
-        placeholder="password"
+        placeholder="Password"
+        secureTextEntry={true}
+        testID='passwordField'
+      />
+      <FormikTextInput
+        style={styles.input}
+        name="password2"
+        placeholder="Password confirmation"
         secureTextEntry={true}
         testID='passwordField'
       />
       <TouchableOpacity testID='submitButton' style={styles.submitButton} onPress={onSubmit}>
-        <Text style={styles.submitButtonText}>Sign in</Text>
+        <Text style={styles.submitButtonText}>Sign up</Text>
       </TouchableOpacity>
     </View>
   );
 };
 
-export const SignInContainer = ({ onSubmit }) => {
+export const SignUpContainer = ({ onSubmit }) => {
 
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
-      {({ handleSubmit }) => <SignInForm onSubmit={handleSubmit} />}
+      {({ handleSubmit }) => <SignUpForm onSubmit={handleSubmit} />}
     </Formik>
   );
 };
 
 // eslint-disable-next-line no-unused-vars
-const SignIn = () => {
+const SignUp = () => {
 
+  const [signUp] = useSignUp();
   const [signIn] = useSignIn();
   let history = useHistory();
 
@@ -91,31 +110,20 @@ const SignIn = () => {
     const { username, password } = values;
 
     try {
-      const bool = await signIn({ username, password });
-      if (bool) history.push("/");
-      else {
-        Alert.alert(
-          'Wrong credentials',
-          'Your username or password is invalid',
-          [
-            {
-              text: 'Cancel',
-              style: 'cancel',
-            },
-            { text: 'OK' },
-          ],
-          { cancelable: false }
-        );
+      const data = await signUp({ username, password });
+      if (data) {
+        const bool = await signIn({ username, password });
+        if (bool) history.push("/");
       }
       
-    } catch(e) {
+    } catch (e) {
       console.log(e);
     }
   };
 
   return (
-    <SignInContainer onSubmit={onSubmit} />
+    <SignUpContainer onSubmit={onSubmit} />
   );
 };
 
-export default SignIn;
+export default SignUp;

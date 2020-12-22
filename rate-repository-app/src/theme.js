@@ -12,7 +12,7 @@ const theme = {
   fontSizes: {
     body: 14,
     subheading: 16,
-    appBar: 24,
+    appBar: 20,
   },
   fonts: {
     main: Platform.select({
